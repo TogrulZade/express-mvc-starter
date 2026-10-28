@@ -1,23 +1,18 @@
-import prisma from '../config/db.js';
+import User from '../models/User.js';
 
 export class UserController {
-  // GET /api/users
   static async index(req, res, next) {
     try {
-      const users = await prisma.user.findMany();
+      const users = await User.find();
       res.json({ success: true, data: users });
     } catch (error) {
       next(error);
     }
   }
 
-  // POST /api/users
   static async store(req, res, next) {
     try {
-      const { name, email } = req.body;
-      const user = await prisma.user.create({
-        data: { name, email },
-      });
+      const user = await User.create(req.body);
       res.status(201).json({ success: true, data: user });
     } catch (error) {
       next(error);

@@ -1,4 +1,4 @@
-# Express MVC Starter — Prisma
+# Express MVC Starter — Mongoose
 
 Laravel bilənlər üçün Express 4 MVC başlanğıcı. Bu repozitoriyada üç ayrı şablon var:
 
@@ -10,20 +10,18 @@ Laravel bilənlər üçün Express 4 MVC başlanğıcı. Bu repozitoriyada üç 
 
 ## Başlamaq
 
-Node.js 22 və ya daha yeni versiya, npm və işlək PostgreSQL lazımdır.
+Node.js 22 və ya daha yeni versiya, npm və işlək MongoDB lazımdır.
 
 ```bash
 npm install
 cp .env.example .env
-# .env içində DATABASE_URL dəyərini öz bazana uyğun dəyiş.
-npm run db:generate
-npm run db:deploy
+# .env içində MONGO_URI dəyərini öz bazana uyğun dəyiş.
 npm run dev
 ```
 
-Əvvəl PostgreSQL-də boş baza yarat. `db:deploy` repozitoriyadakı migration-ları tətbiq edir. `db:migrate -- --name change_name` schema dəyişəndə development bazasında yeni migration yaradır. `db:studio` bazanı brauzerdə açır. Migration fayllarını Git-ə əlavə et.
+MongoDB serverini əvvəl başlat. Bu branch SQL migration istifadə etmir. Server qoşulanda `users` kolleksiyasının unikal email indeksi yaradılır; indeks yaratmaq icazəsi lazımdır. Mövcud bazada təkrar email varsa əvvəl həmin məlumatları düzəlt.
 
-Production build mərhələsində `npm ci`, `npm run db:generate`, sonra migration icazəli deployment mərhələsində `npm run db:deploy` işlə. Serveri `NODE_ENV=production npm start` ilə başlat. Migration alətləri devDependencies-dədir, ona görə həmin mərhələdən əvvəl onları çıxarma.
+Production-da `npm ci --omit=dev`, sonra `NODE_ENV=production npm start` istifadə et. MongoDB-də ayrıca istifadəçi və layihənə uyğun baza icazələri qur.
 
 ## Laravel ilə müqayisə
 
@@ -33,7 +31,7 @@ Production build mərhələsində `npm ci`, `npm run db:generate`, sonra migrati
 | Controller | `src/controllers/UserController.js` |
 | Form Request | `src/middlewares/validate.js` və Zod schema |
 | Exception handler | `src/middlewares/errorHandler.js` |
-| Eloquent və migrations | Prisma client və `prisma/` |
+| Eloquent və migrations | Mongoose modeli: `src/models/User.js` |
 | `php artisan serve` | `npm run dev` |
 
 Sorğu → middleware → route → controller → ORM → JSON cavabı.
