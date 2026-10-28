@@ -1,4 +1,4 @@
-# Express MVC Starter — Prisma
+# Express MVC Starter — Sequelize
 
 Laravel bilənlər üçün Express 4 MVC başlanğıcı. Bu repozitoriyada üç ayrı şablon var:
 
@@ -15,15 +15,14 @@ Node.js 22 və ya daha yeni versiya, npm və işlək PostgreSQL lazımdır.
 ```bash
 npm install
 cp .env.example .env
-# .env içində DATABASE_URL dəyərini öz bazana uyğun dəyiş.
-npm run db:generate
-npm run db:deploy
+# .env içində DB_URI dəyərini öz bazana uyğun dəyiş.
+npm run db:migrate
 npm run dev
 ```
 
-Əvvəl PostgreSQL-də boş baza yarat. `db:deploy` repozitoriyadakı migration-ları tətbiq edir. `db:migrate -- --name change_name` schema dəyişəndə development bazasında yeni migration yaradır. `db:studio` bazanı brauzerdə açır. Migration fayllarını Git-ə əlavə et.
+Əvvəl PostgreSQL-də boş baza yarat. `db:migrate` repozitoriyadakı migration-ları tətbiq edir. `db:migrate:status` vəziyyəti göstərir. Yeni dəyişikliklər üçün `database/migrations/` içində tarixlə başlayan `.cjs` migration yarat və Git-ə əlavə et.
 
-Production build mərhələsində `npm ci`, `npm run db:generate`, sonra migration icazəli deployment mərhələsində `npm run db:deploy` işlə. Serveri `NODE_ENV=production npm start` ilə başlat. Migration alətləri devDependencies-dədir, ona görə həmin mərhələdən əvvəl onları çıxarma.
+Server başlananda yalnız bağlantı yoxlanır; cədvəllər avtomatik `sync()` ilə dəyişdirilmir. Migration-ları serveri başlatmazdan əvvəl işlə. Production-da `npm ci`, sonra `NODE_ENV=production npm run db:migrate`, sonra `NODE_ENV=production npm start` istifadə et. Migration CLI devDependencies-dədir; migration mərhələsinə qədər onu saxla.
 
 ## Laravel ilə müqayisə
 
@@ -33,7 +32,7 @@ Production build mərhələsində `npm ci`, `npm run db:generate`, sonra migrati
 | Controller | `src/controllers/UserController.js` |
 | Form Request | `src/middlewares/validate.js` və Zod schema |
 | Exception handler | `src/middlewares/errorHandler.js` |
-| Eloquent və migrations | Prisma client və `prisma/` |
+| Eloquent və migrations | Sequelize modeli və `database/migrations/` |
 | `php artisan serve` | `npm run dev` |
 
 Sorğu → middleware → route → controller → ORM → JSON cavabı.
@@ -71,3 +70,5 @@ Bu başlanğıcda endpoint-lər açıqdır: login, istifadəçi icazələri və 
 ## Mənbələr
 
 [Express](https://expressjs.com/), [Prisma](https://www.prisma.io/docs), [Sequelize migrations](https://sequelize.org/docs/v6/other-topics/migrations/).
+
+Sequelize-in köhnə `uuid` asılılığındakı audit tapıntısına görə `overrides` ilə CommonJS uyğun `uuid` 11.1.1+ seçilib. Migration və real PostgreSQL əməliyyatları bu seçimlə yoxlanılıb.

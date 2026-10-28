@@ -1,8 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { Sequelize } from 'sequelize';
 
-const prisma = new PrismaClient();
+if (!process.env.DB_URI) throw new Error('DB_URI is required');
+const sequelize = new Sequelize(process.env.DB_URI, { logging: false });
 
-export default prisma;
-
-export const connectDB = () => prisma.$connect();
-export const disconnectDB = () => prisma.$disconnect();
+export default sequelize;
+export const connectDB = () => sequelize.authenticate();
+export const disconnectDB = () => sequelize.close();
