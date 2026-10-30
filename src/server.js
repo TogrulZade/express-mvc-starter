@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import app from './app.js';
 import { connectDB, disconnectDB } from './config/db.js';
+import cache from './services/cache.js';
 
 const PORT = Number(process.env.PORT || 3000);
 let server;
@@ -13,7 +14,9 @@ async function shutdown(code = 0) {
   timer.unref();
   try {
     if (server?.listening) await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
-    await disconnectDB();
+    const results = await Promise.allSettled([disconnectDB(), cache.close()]);
+    const failed = results.find((result) => result.status === 'rejected');
+    if (failed) throw failed.reason;
     process.exitCode = code;
   } catch (error) {
     console.error('Shutdown failed:', error.message);
