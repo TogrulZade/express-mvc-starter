@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createCache } from '../src/services/cache.js';
-import { readCacheConfig } from '../src/config/cache.js';
+import { createCache, readCacheConfig } from '@st/cache';
 
 function memoryCache(options = {}) {
   let time = 0;

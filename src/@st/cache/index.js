@@ -1,6 +1,9 @@
-import config, { validateCacheConfig } from '../config/cache.js';
-import { createMemoryStore } from './cache/memory-store.js';
-import { createRedisStore } from './cache/redis-store.js';
+import { onShutdown } from '@st/core';
+import config, { validateCacheConfig } from './config.js';
+import { createMemoryStore } from './stores/memory.js';
+import { createRedisStore } from './stores/redis.js';
+
+export { readCacheConfig, validateCacheConfig } from './config.js';
 
 export function createCache(options = {}, { now = Date.now } = {}) {
   const settings = validateCacheConfig({ ...config, ...options });
@@ -94,4 +97,5 @@ export function createCache(options = {}, { now = Date.now } = {}) {
 }
 
 const cache = createCache();
+onShutdown(() => cache.close());
 export default cache;
