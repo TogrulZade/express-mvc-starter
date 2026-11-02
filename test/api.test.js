@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 import express from 'express';
-import { errorHandler } from '../src/middlewares/errorHandler.js';
+import { errorHandler } from '@st/http';
 
 // Importing the SQL models needs a URL, but these tests never connect to a DB.
 process.env.NODE_ENV = 'production';
