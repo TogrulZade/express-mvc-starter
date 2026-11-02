@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { readFileSync } from 'node:fs';
+import { appName } from '@st/core';
 
-const { name = 'app' } = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+const name = appName();
 
 export function validateCacheConfig(config) {
   if (!['memory', 'redis'].includes(config.driver)) throw new Error('CACHE_DRIVER must be memory or redis');

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/UserController.js';
-import { validate } from '../middlewares/validate.js';
+import { validate } from '@st/http';
 import { z } from 'zod';
 
 const router = Router();

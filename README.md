@@ -1,6 +1,6 @@
 # Express MVC Starter — Sequelize
 
-Laravel bilənlər üçün Express 4 MVC başlanğıcı. Bu repozitoriyada üç ayrı şablon var:
+Laravel bilənlər üçün Express 5 MVC başlanğıcı. Bu repozitoriyada üç ayrı şablon var:
 
 | Branch | ORM | Baza |
 | --- | --- | --- |
@@ -30,15 +30,34 @@ Server başlananda yalnız bağlantı yoxlanır; cədvəllər avtomatik `sync()`
 | --- | --- |
 | `routes/api.php` | `src/routes/index.js`, `userRoutes.js` |
 | Controller | `src/controllers/UserController.js` |
-| Form Request | `src/middlewares/validate.js` və Zod schema |
-| Exception handler | `src/middlewares/errorHandler.js` |
+| Form Request | `@st/http`-dən `validate` və Zod schema |
+| Exception handler | `@st/http` (`src/@st/http/errorHandler.js`) |
 | Eloquent və migrations | Sequelize modeli və `database/migrations/` |
-| `Cache` facade | `src/services/cache.js` |
+| `Cache` facade | `@st/cache` |
 | `php artisan serve` | `npm run dev` |
 
 Sorğu → middleware → route → controller → ORM → JSON cavabı.
 
-`src/app.js` yalnız Express tətbiqini qurur; testlər port açmadan onu import edə bilər. `src/server.js` əvvəl bazaya qoşulur, sonra HTTP serverini açır. SIGINT/SIGTERM zamanı bağlantılar bağlanır.
+`src/app.js` yalnız Express tətbiqini qurur; testlər port açmadan onu import edə bilər. `src/server.js` əvvəl bazaya qoşulur, sonra HTTP serverini açır. SIGINT/SIGTERM və gözlənilməz xətalarda HTTP server, cache və baza avtomatik bağlanır.
+
+### Framework kodu: `src/@st`
+
+Framework hissəsi `src/@st/` qovluğundadır və npm workspaces ilə `@st/...` paketləri kimi import olunur (NestJS-dəki `@nestjs/*` kimi). Adətən bu qovluğa toxunmaq lazım deyil:
+
+| Paket | Nə verir |
+|---|---|
+| `@st/core` | `startServer`, graceful shutdown, `onShutdown` |
+| `@st/database` | baza bağlantısı (`connectDB`) |
+| `@st/cache` | `cache.remember/put/get/forget` |
+| `@st/http` | `createApp`, `validate`, `errorHandler`, rate limit (`apiLimiter`, `authLimiter`) |
+| `@st/queue` | `st install:queue` ilə əlavə olunur: `dispatch`, `startWorker` |
+
+```js
+import cache from '@st/cache';
+import { validate } from '@st/http';
+```
+
+Express 5 async controller-lərdəki xətaları özü `errorHandler`-ə ötürür, ona görə controller-lərdə `try/catch` lazım deyil.
 
 ## API
 
@@ -58,10 +77,10 @@ Uğurlu create: `201`, yanlış sahələr: `422`, təkrar email: `409`, yanlış
 
 ## Cache
 
-Laravel-dəki `Cache` facade-ə bənzər servis hazırdır: `src/services/cache.js`. Standart olaraq yaddaşda (`memory`) işləyir, əlavə server tələb etmir.
+Laravel-dəki `Cache` facade-ə bənzər servis hazırdır: `@st/cache`. Standart olaraq yaddaşda (`memory`) işləyir, əlavə server tələb etmir.
 
 ```js
-import cache from '../services/cache.js';
+import cache from '@st/cache';
 
 await cache.put('key', { a: 1 }, 600);      // Cache::put('key', $value, 600)
 await cache.get('key', 'default');          // Cache::get('key', 'default')
